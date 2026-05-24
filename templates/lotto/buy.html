@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="card shadow">
+  <div class="card-header bg-success text-white">
+    <h5 class="mb-0">🎟️ 복권 구매 — 제 {{ open_draw.round_no }}회</h5>
+  </div>
+  <div class="card-body">
+    {% if not open_draw %}
+      <div class="alert alert-warning">현재 판매 중인 회차가 없습니다.</div>
+    {% else %}
+    <form method="post">
+      {% csrf_token %}
+      <input type="hidden" name="game_count" id="game_count" value="1">
+
+      <div id="games-container">
+        <!-- 게임 1 -->
+        <div class="game-block border rounded p-3 mb-3" id="game-1">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h6 class="mb-0">🎮 게임 1</h6>
+            <div>
+              <button type="button" class="btn btn-sm btn-outline-primary" onclick="autoFill(1)">자동</button>
+              <button type="button" class="btn btn-sm btn-outline-secondary" onclick="resetGame(1)">초기화</button>
+            </div>
+          </div>
+          <input type="hidden" name="type_1" id="type_1" value="manual">
+          <div class="number-grid mb-2" id="grid-1">
+            {% for n in num_range %}
+              <button type="button" class="btn btn-outline-secondary number-btn"
+                data-game="1" data-num="{{ n }}" onclick="toggleNum(this, 1, {{ n }})">{{ n }}</button>
+            {% endfor %}
+          </div>
+          <div>선택: <span id="selected-1" class="fw-bold text-primary">없음</span></div>
+          {% for j in "123456" %}
+            <input type="hidden" name="num_1_{{ j }}" id="num_1_{{ j }}">
+          {% endfor %}
+        </div>
+      </div>
+
+      <button type="button" class="btn btn-outline-success mb-3" onclick="addGame()" id="add-btn">
+        + 게임 추가 (최대 5게임)
+      </button>
+
+      <div class="d-grid">
+        <button type="submit" class="btn btn-success btn-lg" onclick="return prepareSubmit()">
+          💳 구매하기 (게임당 1,000원)
+        </button>
+      </div>
+    </form>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}
+
+{% block script %}
+<script>
+let gameCount = 1;
+let selected = {1: []};
+
+function toggleNum(btn, game, num) {
+  const sel = selected[game];
+  if (btn.classList.contains('selected')) {
+    selected[game] = sel.filter(n => n !== num);
+    btn.classList.remove('selected');
+  } else {
+    if (sel.length >= 6) { alert('6개만 선택 가능합니다!'); return; }
+    selected[game].push(num);
+    btn.classList.add('selected');
+  }
+  updateDisplay(game);
+}
+
+function updateDisplay(game) {
+  const nums = selected[game].slice().sort((a,b) => a-b);
+  document.getElementById(`selected-${game}`).textContent = nums.length ? nums.join(', ') : '없음';
+}
+
+function autoFill(game) {
+  resetGame(game);
+  document.getElementById(`type_${game}`).value = 'auto';
+  document.getElementById(`selected-${game}`).textContent = '🎲 자동 선택';
+}
+
+function resetGame(game) {
+  selected[game] = [];
+  document.getElementById(`type_${game}`).value = 'manual';
+  document.querySelectorAll(`[data-game="${game}"]`).forEach(b => b.classList.remove('selected'));
+  updateDisplay(game);
+}
+
+function addGame() {
+  if (gameCount >= 5) { alert('최대 5게임입니다!'); return; }
+  gameCount++;
+  selected[gameCount] = [];
+  document.getElementById('game_count').value = gameCount;
+
+  const nums = Array.from({length: 45}, (_, i) => i + 1);
+  const html = `
+    <div class="game-block border rounded p-3 mb-3" id="game-${gameCount}">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h6 class="mb-0">🎮 게임 ${gameCount}</h6>
+        <div>
+          <button type="button" class="btn btn-sm btn-outline-primary" onclick="autoFill(${gameCount})">자동</button>
+          <button type="button" class="btn btn-sm btn-outline-secondary" onclick="resetGame(${gameCount})">초기화</button>
+        </div>
+      </div>
+      <input type="hidden" name="type_${gameCount}" id="type_${gameCount}" value="manual">
+      <div class="number-grid mb-2" id="grid-${gameCount}">
+        ${nums.map(n => `<button type="button" class="btn btn-outline-secondary number-btn"
+          data-game="${gameCount}" data-num="${n}" onclick="toggleNum(this,${gameCount},${n})">${n}</button>`).join('')}
+      </div>
+      <div>선택: <span id="selected-${gameCount}" class="fw-bold text-primary">없음</span></div>
+      ${[1,2,3,4,5,6].map(j => `<input type="hidden" name="num_${gameCount}_${j}" id="num_${gameCount}_${j}">`).join('')}
+    </div>`;
+  document.getElementById('games-container').insertAdjacentHTML('beforeend', html);
+  if (gameCount >= 5) document.getElementById('add-btn').disabled = true;
+}
+
+function prepareSubmit() {
+  for (let g = 1; g <= gameCount; g++) {
+    const type = document.getElementById(`type_${g}`).value;
+    if (type === 'manual') {
+      if (selected[g].length !== 6) { alert(`게임 ${g}: 번호를 6개 선택해주세요!`); return false; }
+      const sorted = selected[g].slice().sort((a,b) => a-b);
+      sorted.forEach((n, i) => { document.getElementById(`num_${g}_${i+1}`).value = n; });
+    }
+  }
+  return true;
+}
+</script>
+{% endblock %}

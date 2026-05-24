@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>🎰 6/45 로또</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { background: #f8f9fa; }
+    .navbar { background: linear-gradient(135deg, #1a1a2e, #16213e); }
+    .navbar-brand { font-size: 1.5rem; font-weight: bold; }
+    .lotto-ball {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 42px; height: 42px; border-radius: 50%;
+      font-weight: bold; font-size: 0.9rem; color: white; margin: 2px;
+    }
+    .ball-1  { background: #f9ca24; color: #333; }
+    .ball-2  { background: #6c5ce7; }
+    .ball-3  { background: #e17055; }
+    .ball-4  { background: #00b894; }
+    .ball-5  { background: #0984e3; }
+    .ball-bonus { background: #636e72; border: 2px dashed #fff; }
+    .number-btn {
+      width: 46px; height: 46px; border-radius: 50%;
+      font-weight: bold; margin: 3px;
+    }
+    .number-btn.selected {
+      background: #0984e3; color: white; border-color: #0984e3;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-dark navbar-expand-lg mb-4">
+    <div class="container">
+      <a class="navbar-brand text-warning" href="/">🎰 6/45 로또</a>
+      <div class="ms-auto d-flex gap-2 align-items-center">
+        {% if user.is_authenticated %}
+          <span class="text-light">👤 {{ user.username }}</span>
+          {% if user.is_staff %}
+            <a href="/admin-panel/" class="btn btn-warning btn-sm">관리자</a>
+          {% endif %}
+          <a href="/lotto/buy/" class="btn btn-success btn-sm">복권 구매</a>
+          <a href="/lotto/my-tickets/" class="btn btn-outline-light btn-sm">내 복권</a>
+          <form method="post" action="/accounts/logout/" class="d-inline">
+            {% csrf_token %}
+            <button class="btn btn-outline-danger btn-sm">로그아웃</button>
+          </form>
+        {% else %}
+          <a href="/accounts/login/" class="btn btn-outline-light btn-sm">로그인</a>
+          <a href="/accounts/register/" class="btn btn-warning btn-sm">회원가입</a>
+        {% endif %}
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    {% for msg in messages %}
+      <div class="alert alert-{{ msg.tags }} alert-dismissible fade show">
+        {{ msg }} <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    {% endfor %}
+    {% block content %}{% endblock %}
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  {% block script %}{% endblock %}
+</body>
+</html>

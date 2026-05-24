@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="row justify-content-center">
+  <div class="col-md-7">
+    <div class="card shadow">
+      <div class="card-header bg-warning">
+        <h5 class="mb-0">🎰 제 {{ draw.round_no }}회 추첨</h5>
+      </div>
+      <div class="card-body">
+        <form method="post">
+          {% csrf_token %}
+
+          <div class="mb-4">
+            <label class="form-label fw-bold">추첨 방식</label>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="draw_type"
+                id="auto" value="auto" checked onchange="toggleManual()">
+              <label class="form-check-label" for="auto">🎲 자동 추첨</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="draw_type"
+                id="manual_draw" value="manual" onchange="toggleManual()">
+              <label class="form-check-label" for="manual_draw">✏️ 수동 입력</label>
+            </div>
+          </div>
+
+          <div id="manual-inputs" style="display:none;">
+            <label class="form-label fw-bold">당첨 번호 6개 입력 (1~45)</label>
+            <div class="row g-2 mb-3">
+              <div class="col-4 col-md-2">
+                <input type="number" name="num1" class="form-control text-center" min="1" max="45" placeholder="1번">
+              </div>
+              <div class="col-4 col-md-2">
+                <input type="number" name="num2" class="form-control text-center" min="1" max="45" placeholder="2번">
+              </div>
+              <div class="col-4 col-md-2">
+                <input type="number" name="num3" class="form-control text-center" min="1" max="45" placeholder="3번">
+              </div>
+              <div class="col-4 col-md-2">
+                <input type="number" name="num4" class="form-control text-center" min="1" max="45" placeholder="4번">
+              </div>
+              <div class="col-4 col-md-2">
+                <input type="number" name="num5" class="form-control text-center" min="1" max="45" placeholder="5번">
+              </div>
+              <div class="col-4 col-md-2">
+                <input type="number" name="num6" class="form-control text-center" min="1" max="45" placeholder="6번">
+              </div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-bold">보너스 번호</label>
+              <input type="number" name="bonus" class="form-control"
+                min="1" max="45" placeholder="보너스" style="max-width:120px;">
+            </div>
+          </div>
+
+          <div class="d-grid">
+            <button class="btn btn-warning btn-lg"
+              onclick="return confirm('추첨을 실행하시겠습니까?')">
+              🎰 추첨 실행
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block script %}
+<script>
+function toggleManual() {
+  const isManual = document.getElementById('manual_draw').checked;
+  document.getElementById('manual-inputs').style.display = isManual ? 'block' : 'none';
+}
+</script>
+{% endblock %}

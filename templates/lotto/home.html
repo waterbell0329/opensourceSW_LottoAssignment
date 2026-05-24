@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="row g-4">
+  <!-- 최신 당첨 번호 -->
+  <div class="col-12">
+    <div class="card shadow">
+      <div class="card-header bg-dark text-white">
+        <h5 class="mb-0">🏆 최신 당첨 번호</h5>
+      </div>
+      <div class="card-body text-center py-4">
+        {% if latest_draw %}
+          <h6 class="text-muted mb-3">제 {{ latest_draw.round_no }}회 ({{ latest_draw.draw_date }})</h6>
+          <div>
+            {% for n in latest_draw.winning_numbers %}
+              {% if n <= 10 %}
+                <span class="lotto-ball ball-1">{{ n }}</span>
+              {% elif n <= 20 %}
+                <span class="lotto-ball ball-2">{{ n }}</span>
+              {% elif n <= 30 %}
+                <span class="lotto-ball ball-3">{{ n }}</span>
+              {% elif n <= 40 %}
+                <span class="lotto-ball ball-4">{{ n }}</span>
+              {% else %}
+                <span class="lotto-ball ball-5">{{ n }}</span>
+              {% endif %}
+            {% endfor %}
+            <span class="mx-2 text-muted fw-bold">+</span>
+            <span class="lotto-ball ball-bonus">{{ latest_draw.bonus }}</span>
+          </div>
+        {% else %}
+          <p class="text-muted">아직 추첨된 회차가 없습니다.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- 현재 판매 중 -->
+  <div class="col-md-6">
+    <div class="card shadow h-100">
+      <div class="card-header bg-success text-white">
+        <h5 class="mb-0">🎟️ 현재 판매 중</h5>
+      </div>
+      <div class="card-body text-center py-4">
+        {% if open_draw %}
+          <h4>제 {{ open_draw.round_no }}회</h4>
+          <p class="text-muted">추첨일: {{ open_draw.draw_date }}</p>
+          {% if user.is_authenticated %}
+            <a href="/lotto/buy/" class="btn btn-success btn-lg">지금 구매하기</a>
+          {% else %}
+            <a href="/accounts/login/" class="btn btn-outline-success">로그인 후 구매</a>
+          {% endif %}
+        {% else %}
+          <p class="text-muted">현재 판매 중인 회차가 없습니다.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- 당첨 안내 -->
+  <div class="col-md-6">
+    <div class="card shadow h-100">
+      <div class="card-header bg-warning">
+        <h5 class="mb-0">💰 당첨 기준</h5>
+      </div>
+      <div class="card-body p-0">
+        <table class="table table-striped mb-0">
+          <thead><tr><th>등수</th><th>조건</th><th>당첨금</th></tr></thead>
+          <tbody>
+            <tr><td><span class="badge bg-warning text-dark">1등</span></td><td>6개 일치</td><td>20억</td></tr>
+            <tr><td><span class="badge bg-primary">2등</span></td><td>5개 + 보너스</td><td>5천만</td></tr>
+            <tr><td><span class="badge bg-success">3등</span></td><td>5개 일치</td><td>150만</td></tr>
+            <tr><td><span class="badge bg-danger">4등</span></td><td>4개 일치</td><td>5만원</td></tr>
+            <tr><td><span class="badge bg-secondary">5등</span></td><td>3개 일치</td><td>5천원</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h4 class="mb-4">🏆 당첨 확인 — 제 {{ draw.round_no }}회</h4>
+
+{% if draw.status == 'drawn' %}
+<div class="card mb-4 shadow">
+  <div class="card-header bg-dark text-white">당첨 번호</div>
+  <div class="card-body text-center">
+    {% for n in draw.winning_numbers %}
+      <span class="lotto-ball ball-{{ forloop.counter }}">{{ n }}</span>
+    {% endfor %}
+    <span class="mx-2 text-muted">+</span>
+    <span class="lotto-ball ball-bonus">{{ draw.bonus }}</span>
+  </div>
+</div>
+{% endif %}
+
+{% for result in results %}
+<div class="card mb-3 shadow {% if result.rank == 1 %}border-warning{% elif result.rank %}border-success{% endif %}">
+  <div class="card-body">
+    <div class="d-flex justify-content-between align-items-center">
+      <div>
+        <small class="text-muted">{{ result.tn.game_no }}번 게임</small><br>
+        {% for n in result.tn.numbers %}
+          <span class="lotto-ball ball-1" style="width:32px;height:32px;font-size:0.75rem;">{{ n }}</span>
+        {% endfor %}
+      </div>
+      <div class="text-end">
+        {% if result.rank == None %}
+          <span class="badge bg-secondary fs-6">추첨 전</span>
+        {% elif result.rank == 0 %}
+          <span class="badge bg-danger fs-6">미당첨</span>
+        {% elif result.rank == 1 %}
+          <span class="badge bg-warning text-dark fs-6">🏆 1등!</span>
+          <div class="text-warning fw-bold">20억원</div>
+        {% elif result.rank == 2 %}
+          <span class="badge bg-primary fs-6">🥈 2등</span>
+          <div class="text-primary fw-bold">5천만원</div>
+        {% elif result.rank == 3 %}
+          <span class="badge bg-success fs-6">🥉 3등</span>
+          <div class="text-success fw-bold">150만원</div>
+        {% elif result.rank == 4 %}
+          <span class="badge bg-info fs-6">4등</span>
+          <div class="fw-bold">5만원</div>
+        {% elif result.rank == 5 %}
+          <span class="badge bg-secondary fs-6">5등</span>
+          <div class="fw-bold">5천원</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endfor %}
+
+<a href="/lotto/my-tickets/" class="btn btn-outline-secondary">← 내 복권 목록</a>
+
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <div class="card shadow">
+      <div class="card-header bg-success text-white">
+        <h5 class="mb-0">+ 새 회차 생성</h5>
+      </div>
+      <div class="card-body">
+        <form method="post">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label fw-bold">회차 번호</label>
+            <input type="number" name="round_no" class="form-control" placeholder="예: 1" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-bold">추첨일</label>
+            <input type="date" name="draw_date" class="form-control" required>
+          </div>
+          <div class="d-grid">
+            <button class="btn btn-success">생성하기</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
